@@ -18,7 +18,7 @@ const CreatePost = () => {
     if (form.prompt) {
       try {
         setGeneratingImg(true);
-        const response = await fetch('http://localhost:8080/api/v1/ann', {
+        const response = await fetch('https://annai.onrender.com/api/v1/ann', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
