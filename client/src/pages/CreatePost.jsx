@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 
 import preview from '../assets/preview.png';
 import {getRandomPrompt} from '../utils';
+import {API_URL} from '../constants';
 import {FormField, Loader} from '../components';
 
 const CreatePost = () => {
@@ -18,7 +19,7 @@ const CreatePost = () => {
     if (form.prompt) {
       try {
         setGeneratingImg(true);
-        const response = await fetch('https://annai.onrender.com/api/v1/ann', {
+        const response = await fetch(`${API_URL}/api/v1/ann`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -26,6 +27,10 @@ const CreatePost = () => {
           body: JSON.stringify({prompt: form.prompt}),
         });
         const data = await response.json();
+        if (!response.ok) {
+          alert(data?.error || data || 'Image generation failed');
+          return;
+        }
         setForm({...form, photo: `data:image/jpeg;base64,${data.photo}`});
       } catch (error) {
         alert(error);
@@ -41,14 +46,18 @@ const CreatePost = () => {
     if (form.prompt && form.photo) {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:8080/api/v1/posts', {
+        const response = await fetch(`${API_URL}/api/v1/posts`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(form),
         });
-        await response.json();
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data?.message || 'Failed to share post');
+          return;
+        }
         navigate('/');
       } catch (error) {
         alert(error);
@@ -70,14 +79,17 @@ const CreatePost = () => {
   return (
     <section className='max-w-7xl mx-auto'>
       <div>
-        <h1 className='font-extrabold text-[#222328] text-[32px]'>
-          Create Post
+        <h1 className='font-extrabold text-neutral-900 text-[32px] sm:text-[40px] tracking-tight'>
+          Create{' '}
+          <span className='bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent'>
+            Post
+          </span>
         </h1>
-        <p className='mt-2 text-[#666e75] text-[16px] max-w-[500px]'>
+        <p className='mt-3 text-neutral-500 text-[16px] max-w-[500px]'>
           Create imaginative and visually stunning through AI
         </p>
       </div>
-      <form className='mt-16 max-w-3xl' onSubmit={handleSubmit}>
+      <form className='mt-14 max-w-3xl' onSubmit={handleSubmit}>
         <div className='flex flex-col gap-5'>
           <FormField
             labelName='Your Name'
@@ -98,7 +110,7 @@ const CreatePost = () => {
             isSurpriseMe
             handleSurpriseMe={handleSurpriseMe}
           />
-          <div className='relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 p-3 h-64 flex justify-center items-center'>
+          <div className='relative bg-neutral-50 border-2 border-dashed border-black/15 text-neutral-900 text-sm rounded-2xl w-64 p-3 h-64 flex justify-center items-center overflow-hidden'>
             {form.photo ? (
               <img
                 src={form.photo}
@@ -113,30 +125,31 @@ const CreatePost = () => {
               />
             )}
             {generatingImg && (
-              <div className='absolute inset-0 z-0 flex justify-center items-center bg-[rgba(0,,0,0,0.5)] rounded-lg'>
+              <div className='absolute inset-0 z-0 flex justify-center items-center bg-white/60 backdrop-blur-sm'>
                 <Loader />
               </div>
             )}
           </div>
         </div>
 
-        <div className='mt-5 flex gap-5'>
+        <div className='mt-6 flex gap-5'>
           <button
             type='button'
             onClick={generateImage}
-            className='text-white bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center'
+            disabled={generatingImg}
+            className='bg-neutral-900 text-white font-medium rounded-full text-sm w-full sm:w-auto px-6 py-2.5 text-center hover:bg-neutral-700 transition disabled:opacity-60'
           >
             {generatingImg ? 'Generating...' : 'Generate Image'}
           </button>
         </div>
         <div className='mt-10'>
-          <p className='mt-2 text-[#666e75] text-[14px]'>
+          <p className='mt-2 text-neutral-500 text-[14px]'>
             Once you have created the image you want, you can share it with
             others in the community{' '}
           </p>
           <button
             type='submit'
-            className='mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center'
+            className='mt-3 bg-white border border-black/15 text-neutral-900 font-medium rounded-full text-sm w-full sm:w-auto px-6 py-2.5 text-center hover:bg-neutral-50 transition'
           >
             {loading ? 'Sharing...' : 'Share with the community'}
           </button>

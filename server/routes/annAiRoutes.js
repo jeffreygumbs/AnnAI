@@ -1,16 +1,14 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
-import {Configuration, OpenAIApi} from 'openai';
+import {GoogleGenAI} from '@google/genai';
 
 dotenv.config();
 
 const router = express.Router();
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openai = new OpenAIApi(configuration);
+let ai;
+const getAI = () =>
+  (ai ??= new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY}));
 
 router.route('/').get((req, res) => {
   res.send('Hello from Ann AI post');
@@ -19,17 +17,20 @@ router.route('/').get((req, res) => {
 router.route('/').post(async (req, res) => {
   try {
     const {prompt} = req.body;
-    const aiResponse = await openai.createImage({
-      prompt,
-      n: 1,
-      size: '1024x1024',
-      response_format: 'b64_json',
+    const response = await getAI().models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: prompt,
     });
-    const image = aiResponse.data.data[0].b64_json;
-    res.status(200).json({photo: image});
+    const imagePart = response.candidates?.[0]?.content?.parts?.find(
+      (part) => part.inlineData?.data
+    );
+    if (!imagePart) {
+      throw new Error('No image was generated, please try again');
+    }
+    res.status(200).json({photo: imagePart.inlineData.data});
   } catch (error) {
     console.log(error);
-    res.status(500).json(error?.response.data.error.message);
+    res.status(500).json(error?.message || 'Image generation failed');
   }
 });
 

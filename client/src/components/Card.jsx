@@ -4,20 +4,20 @@ import {downloadImage} from '../utils';
 
 const Card = ({_id, name, prompt, photo}) => {
   return (
-    <div className='rounded-xl group relative shadow-card hover:shadow-cardhover card'>
+    <div className='rounded-2xl group relative shadow-card hover:shadow-cardhover card border border-black/5 bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1'>
       <img
-        className='w-full h-auto object-cover rounded-xl'
+        className='w-full h-auto object-cover'
         src={photo}
         alt={prompt}
       />
-      <div className='group-hover:flex flex-col max-h-[94.5%] hidden absolute bottom-0 left-0 right-0 bg-[#10131f] m-2 p-4 rounded-md'>
-        <p className='text-white text-md overflow-y-auto prompt'>{prompt}</p>
+      <div className='group-hover:flex flex-col max-h-[94.5%] hidden absolute bottom-0 left-0 right-0 bg-white/85 backdrop-blur-md border border-black/10 m-2 p-4 rounded-xl'>
+        <p className='text-neutral-800 text-sm overflow-y-auto prompt'>{prompt}</p>
         <div className='mt-5 flex justify-between items-center gap-2'>
           <div className='flex items-center gap-2'>
-            <div className='w-7 h-7 rounded-full object-cover bg-green-700 flex justify-center items-center text-white text-xs font-bold'>
+            <div className='w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-teal-500 flex justify-center items-center text-white text-xs font-bold'>
               {name[0]}
             </div>
-            <p className='text-white text-sm'>{name}</p>
+            <p className='text-neutral-600 text-sm'>{name}</p>
           </div>
           <button
             type='button'
@@ -27,7 +27,7 @@ const Card = ({_id, name, prompt, photo}) => {
             <img
               src={download}
               alt='download'
-              className='w-6 h-6 object-contain invert'
+              className='w-6 h-6 object-contain opacity-50 hover:opacity-100 transition'
             />
           </button>
         </div>

@@ -1,3 +1,5 @@
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 export const surpriseMePrompts = [
   'an armchair in the shape of an avocado',
   'a surrealist dream-like oil painting by Salvador Dalí of a cat playing checkers',
